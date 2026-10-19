@@ -1,0 +1,18 @@
+import { useMemo } from "react";
+import { AlertTriangle, CarFront, Fence, MapPin, Radio, ShieldCheck } from "lucide-react";
+import type { Vehicle } from "../types/fleet";
+
+const geofences = ["CBD Zone", "Kacyiru Zone", "Kimironko Zone", "Depot Zone"];
+export default function Security({ vehicles }: { vehicles: Vehicle[] }) {
+  const alerts = useMemo(() => vehicles.filter((v) => v.status === "CRITICAL"), [vehicles]);
+  return <div className="space-y-6">
+    <div><p className="text-xs font-bold uppercase tracking-[0.2em] text-sky-600">Fleet Protection</p><h1 className="mt-1 text-2xl font-black text-slate-900">Security &amp; Tracking</h1><p className="mt-1 text-sm text-slate-500">Review simulated vehicle locations and diagnostic security observations.</p></div>
+    <div className="flex items-start gap-3 rounded-2xl border border-sky-100 bg-sky-50 p-4"><Radio size={20} className="shrink-0 text-sky-600"/><div><p className="text-sm font-bold text-sky-900">SECURITY SOFTWARE SIMULATION</p><p className="mt-1 text-xs text-sky-700">Locations and alerts are generated from simulated telemetry. No trackers, geofences, or remote controls are connected.</p></div></div>
+    <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <Metric icon={<ShieldCheck size={22}/>} label="Monitored Vehicles" value={vehicles.length}/><Metric icon={<AlertTriangle size={22}/>} label="Critical Vehicles" value={alerts.length}/><Metric icon={<Fence size={22}/>} label="Configured Demo Zones" value={geofences.length}/><Metric icon={<CarFront size={22}/>} label="Positions Available" value={`${vehicles.length}/${vehicles.length}`}/>
+    </section>
+    <section className="rounded-2xl border border-slate-200 bg-white shadow-sm"><div className="border-b border-slate-100 px-5 py-4"><h2 className="font-bold text-slate-900">Vehicle Monitoring</h2><p className="text-xs text-slate-500">Critical diagnostics are shown for review; these are not intrusion or geofence alerts.</p></div><div className="divide-y divide-slate-100">{vehicles.map(v=><div key={v.id} className="flex flex-col gap-3 px-5 py-4 md:flex-row md:items-center md:justify-between"><div className="flex items-center gap-3"><CarFront size={19} className="text-slate-500"/><div><p className="text-sm font-bold text-slate-900">{v.id}</p><p className="text-xs text-slate-500">{v.route}</p></div></div><div className="flex items-center gap-4 text-xs text-slate-600"><span className="flex items-center gap-1"><MapPin size={14}/>{v.location}</span><span>{v.speed} km/h</span><span className={`font-black ${v.status === "CRITICAL" ? "text-red-600" : v.status === "WARNING" ? "text-amber-600" : "text-emerald-600"}`}>{v.status}</span></div></div>)}</div></section>
+    <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><h2 className="font-bold text-slate-900">Demo Geofences</h2><p className="mt-1 text-xs text-slate-500">Zone outlines are labels only; no boundary crossing is evaluated.</p><div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">{geofences.map(zone=><div key={zone} className="rounded-xl bg-slate-50 p-3 text-sm font-semibold text-slate-700">{zone}<span className="mt-1 block text-xs font-bold text-slate-400">CONFIGURED DEMO</span></div>)}</div></section>
+  </div>;
+}
+function Metric({icon,label,value}:{icon:React.ReactNode;label:string;value:string|number}) { return <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><div className="text-sky-600">{icon}</div><p className="mt-4 text-xs font-bold uppercase tracking-wider text-slate-400">{label}</p><p className="mt-1 text-3xl font-black text-slate-900">{value}</p></div>; }
